@@ -19,6 +19,20 @@
           with:
             fetch-depth: 0
 
+        - name: Set up Go
+          uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9
+          with:
+            go-version: 'stable'
+            check-latest: true
+            cache: true
+            cache-dependency-path: go.sum
+
+        - name: Build
+          run: go build .
+
+        - name: Test
+          run: go test -timeout=600s -v
+
         - name: GPG config
           run: |
             mkdir -p ~/.gnupg
@@ -27,14 +41,6 @@
             keyserver-options auto-key-retrieve
             EOF
             gpg --keyserver keys.openpgp.org --recv-keys 09BCBD851A844769EDBC49DC8637145C78A9BF43
-
-        - name: Set up Go
-          uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9
-          with:
-            go-version: 'stable'
-            check-latest: true
-            cache: true
-            cache-dependency-path: go.sum
 
         - name: Build release changelog
           run: |

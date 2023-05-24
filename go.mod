@@ -1,4 +1,4 @@
-module github.com/seatgeek/docker-mirror
+module github.com/chrismckee/docker-mirror
 
 go 1.20
 

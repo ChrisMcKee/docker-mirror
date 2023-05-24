@@ -193,7 +193,7 @@ func worker(wg *sync.WaitGroup, workerCh chan Repository, dc *DockerClient, ecrm
 		select {
 		case repo := <-workerCh:
 			// Check if the given host is from our support list.
-			if repo.Host != "" && repo.Host != dockerHub && repo.Host != quay && repo.Host != gcr && repo.Host != k8s {
+			if repo.Host != "" && repo.Host != dockerHub && repo.Host != quay && repo.Host != gcr && repo.Host != k8s && repo.Host != msft {
 				log.Errorf("Could not pull images from host: %s. We support %s, %s, %s, and %s", repo.Host, dockerHub, quay, gcr, k8s)
 				wg.Done()
 				continue

@@ -23,6 +23,7 @@ const (
 	quay      = "quay.io"
 	gcr       = "gcr.io"
 	k8s       = "k8s.gcr.io"
+	msft      = "mcr.microsoft.com"
 )
 
 var (
@@ -175,7 +176,7 @@ func (m *mirror) filterTags() {
 	m.remoteTags = res
 }
 
-// return the name of repostiory, as it should be on the target
+// return the name of repository, as it should be on the target
 // this include any target repository prefix + the repository name in DockerHub
 func (m *mirror) targetRepositoryName() string {
 	if m.repo.TargetPrefix != nil {
@@ -212,11 +213,10 @@ func (m *mirror) pullImage(tag string) error {
 			return (*m.dockerClient).PullImage(pullOptions, authConfig)
 		}
 	case quay:
-		pullOptions.Repository = quay + "/" + m.repo.Name
 	case gcr:
-		pullOptions.Repository = gcr + "/" + m.repo.Name
 	case k8s:
-		pullOptions.Repository = k8s + "/" + m.repo.Name
+	case msft:
+		pullOptions.Repository = m.repo.Host + "/" + m.repo.Name
 	}
 
 	return (*m.dockerClient).PullImage(pullOptions, authConfig)
@@ -237,11 +237,10 @@ func (m *mirror) tagImage(tag string) error {
 	case dockerHub:
 		return (*m.dockerClient).TagImage(fmt.Sprintf("%s:%s", m.repo.Name, tag), tagOptions)
 	case quay:
-		return (*m.dockerClient).TagImage(fmt.Sprintf("%s/%s:%s", quay, m.repo.Name, tag), tagOptions)
 	case gcr:
-		return (*m.dockerClient).TagImage(fmt.Sprintf("%s/%s:%s", gcr, m.repo.Name, tag), tagOptions)
 	case k8s:
-		return (*m.dockerClient).TagImage(fmt.Sprintf("%s/%s:%s", k8s, m.repo.Name, tag), tagOptions)
+	case msft:
+		return (*m.dockerClient).TagImage(fmt.Sprintf("%s/%s:%s", m.repo.Host, m.repo.Name, tag), tagOptions)
 	}
 
 	return nil
@@ -283,11 +282,10 @@ func (m *mirror) deleteImage(tag string) error {
 	case dockerHub:
 		repository = fmt.Sprintf("%s:%s", m.repo.Name, tag)
 	case quay:
-		repository = fmt.Sprintf("%s/%s:%s", quay, m.repo.Name, tag)
 	case gcr:
-		repository = fmt.Sprintf("%s/%s:%s", gcr, m.repo.Name, tag)
 	case k8s:
-		repository = fmt.Sprintf("%s/%s:%s", k8s, m.repo.Name, tag)
+	case msft:
+		repository = fmt.Sprintf("%s/%s:%s", m.repo.Host, m.repo.Name, tag)
 	}
 	m.log.Info("Cleaning images: " + repository)
 	err := (*m.dockerClient).RemoveImage(repository)
@@ -412,6 +410,8 @@ func (m *mirror) getRemoteTags() ([]RepositoryTag, error) {
 		url = fmt.Sprintf("https://gcr.io/v2/%s/tags/list", fullRepoName)
 	case k8s:
 		url = fmt.Sprintf("https://k8s.gcr.io/v2/%s/tags/list", fullRepoName)
+	case msft: //https://mcr.microsoft.com/v2/windows/servercore/tags/list
+		url = fmt.Sprintf("https://mcr.microsoft.com/v2/%s/tags/list", fullRepoName)
 	}
 
 	var allTags []RepositoryTag
@@ -483,17 +483,8 @@ search:
 			allTags = append(allTags, tags.Tags...)
 			break search
 		case gcr:
-			var tags GCRTagsResponse
-			if err := dc.Decode(&tags); err != nil {
-				return nil, err
-			}
-			for _, tag := range tags.Tags {
-				allTags = append(allTags, RepositoryTag{
-					Name: tag,
-				})
-			}
-			break search
 		case k8s:
+		case msft:
 			var tags GCRTagsResponse
 			if err := dc.Decode(&tags); err != nil {
 				return nil, err

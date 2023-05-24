@@ -16,7 +16,6 @@ builds:
     env:
       - CGO_ENABLED=0
     goos:
-      - darwin
       - linux
     goarch:
       - amd64
@@ -37,7 +36,7 @@ builds:
     ignore:
       - goos: windows
         goarch: arm
-    binary: gofmtnginx-{{.Os}}-{{.Arch}}v{{.Arm}}
+    binary: docker-mirror-{{.Os}}-{{.Arch}}v{{.Arm}}
 
   - <<: *build_default
     id: pkg-docker-mirror
