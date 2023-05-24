@@ -1,6 +1,6 @@
 module github.com/seatgeek/docker-mirror
 
-go 1.17
+go 1.20
 
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.1.1
