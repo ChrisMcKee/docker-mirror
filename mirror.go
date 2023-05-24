@@ -112,10 +112,10 @@ func (m *mirror) setup(repo Repository) (err error) {
 }
 
 // filter tags by
-//  - by matching tag name (with glob support)
-//  - by exluding tag name (with glob support)
-//  - by tag age
-//  - by max number of tags to process
+//   - by matching tag name (with glob support)
+//   - by excluding tag name (with glob support)
+//   - by tag age
+//   - by max number of tags to process
 func (m *mirror) filterTags() {
 	now := time.Now()
 	res := make([]RepositoryTag, 0)

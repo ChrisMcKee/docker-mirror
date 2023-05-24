@@ -28,16 +28,6 @@
             EOF
             gpg --keyserver keys.openpgp.org --recv-keys 09BCBD851A844769EDBC49DC8637145C78A9BF43
 
-        - name: Verify tag signature
-          run: |
-            # NOTE: Solve the problem with Github action checkout
-            # https://github.com/actions/checkout/issues/290
-            git fetch --tags --force
-
-            version=${GITHUB_REF#refs/tags/*}
-            git show --oneline $version
-            git tag -v $version
-
         - name: Set up Go
           uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9
           with:
